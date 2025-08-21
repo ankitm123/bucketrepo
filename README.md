@@ -134,6 +134,16 @@ make build
 bin/bucketrepo -config-path=config -log-level=debug
 ```
 
+to debug:
+```bash
+sudo dlv --listen=:2345 --headless=true --api-version=2 exec ./bin/bucketrepo -- -config-path=config -log-level=debug
+```
+your config can be copied from the server using a command like this:
+```bash
+kubectl -n jx get secret bucketrepo-config -o jsonpath='{.data.config\.yaml}' | base64 -d > ./config/config.yaml
+```
+Do not forget to copy your env variables...
+
 ### Maven Configuration
 
 `bucketrepo`can be configured as a mirror by adding the following in `~/.m2/settings.xml` file:
