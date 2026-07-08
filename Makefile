@@ -38,12 +38,18 @@ clean:
 lint_install:
 	$(GO_NOMOD) get -u golang.org/x/lint/golint
 
-.PHONY: lint
-lint: lint_install
+.PHONY: lint-install
+lint-install:
 	@echo "LINTING"
 	$(GOLINT) -set_exit_status ./... 
 	@echo "VETTING"
-	$(GO) vet ./... 
+	$(GO) vet ./...
+
+.PHONY: lint
+lint: ## Lint the code
+	./hack/gofmt.sh
+	./hack/linter.sh
+	./hack/generate.sh
 
 sec_install:
 	$(GO_NOMOD) get -u github.com/securego/gosec/cmd/gosec

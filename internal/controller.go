@@ -41,10 +41,10 @@ type FileController struct {
 }
 
 // NewFileController creates a new file controller
-func NewFileController(cache Storage, storage Storage, repositories []Repository, config Config) (*FileController, error) {
+func NewFileController(cache, storage Storage, repositories []Repository, config *Config) (*FileController, error) {
 	chartsPath := config.HTTP.ChartPath
 	ctrl := &FileController{
-		config:       config,
+		config:       *config,
 		cache:        cache,
 		cloudStorage: storage,
 		repositories: repositories,

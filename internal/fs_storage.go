@@ -65,14 +65,14 @@ func (fs *FileSystemStorage) RemoveUnusedArtifacts(ctrl *FileController) {
 			logrus.WithError(err).Errorf("can't compile string %s to regexp", keepString)
 		}
 	}
-	err = filepath.Walk(fs.config.BaseDir, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(fs.config.BaseDir, func(path string, info os.FileInfo, _ error) error {
 		if keepRegExp != nil && keepRegExp.MatchString(path) {
 			return nil
 		}
 		aTime := atime.Get(info)
 		if aTime.Before(maxAccessTime) {
 			logrus.Debugf("removing %s that has not been accessed since %s", path, aTime)
-			err := os.RemoveAll(path)
+			err := os.RemoveAll(path) // #nosec G122
 			if err != nil {
 				return err
 			}
@@ -87,7 +87,7 @@ func (fs *FileSystemStorage) RemoveUnusedArtifacts(ctrl *FileController) {
 	}
 }
 
-func resolvePath(basedir string, filepath string) string {
+func resolvePath(basedir, filepath string) string {
 	return path.Join(basedir, filepath)
 }
 
