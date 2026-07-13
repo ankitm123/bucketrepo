@@ -32,7 +32,7 @@ spec:
           resources: {}
         - name: build-container-build
           resources: {}
-        - image: ghcr.io/jenkins-x-plugins/jx-preview:0.7.12
+        - image: ghcr.io/jenkins-x-plugins/jx-preview:0.2.3
           name: promote-jx-preview
           resources: {}
           script: |
