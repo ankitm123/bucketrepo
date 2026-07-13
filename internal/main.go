@@ -35,7 +35,7 @@ func main() {
 		repositories[i] = NewRepository(r)
 	}
 
-	controller, err := NewFileController(cache, storage, repositories, config)
+	controller, err := NewFileController(cache, storage, repositories, &config)
 	if err != nil {
 		logrus.Fatalf("failed to initialise controller: %s", err.Error())
 	}
@@ -51,5 +51,5 @@ func main() {
 	}
 
 	logrus.Infof("serving http")
-	InitHTTP(config.HTTP, controller)
+	InitHTTP(&config.HTTP, controller)
 }

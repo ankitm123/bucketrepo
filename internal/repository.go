@@ -46,7 +46,7 @@ func (r *HTTPRepository) DownloadFile(filePath string) (io.ReadCloser, error) {
 	}
 	u.Path = path.Join(u.Path, filePath)
 
-	request, err := http.NewRequest(http.MethodGet, u.String(), nil)
+	request, err := http.NewRequest(http.MethodGet, u.String(), http.NoBody)
 	if err != nil {
 		return nil, err
 	}

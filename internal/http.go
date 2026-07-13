@@ -3,13 +3,14 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 	log "github.com/sirupsen/logrus"
 )
 
 // basicAuth creates a wrapper for basic authentication
-func basicAuth(h httprouter.Handle, config HTTPConfig) httprouter.Handle {
+func basicAuth(h httprouter.Handle, config *HTTPConfig) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		user, password, hasAuth := r.BasicAuth()
 
@@ -23,19 +24,19 @@ func basicAuth(h httprouter.Handle, config HTTPConfig) httprouter.Handle {
 }
 
 // noAuth creates a wrapper without any authentication
-func noAuth(h httprouter.Handle, config HTTPConfig) httprouter.Handle {
+func noAuth(h httprouter.Handle, _ *HTTPConfig) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		h(w, r, ps)
 	}
 }
 
 // health handles the health check requests
-func health(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func health(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 	fmt.Fprintf(w, "OK")
 }
 
 // InitHTTP initializes the HTTP server routes
-func InitHTTP(config HTTPConfig, controller *FileController) {
+func InitHTTP(config *HTTPConfig, controller *FileController) {
 	router := httprouter.New()
 	// Enable basic auth only for https
 	auth := noAuth
@@ -52,10 +53,16 @@ func InitHTTP(config HTTPConfig, controller *FileController) {
 		router.POST(URLJoin("/bucketrepo", config.ChartPath, "/api/charts"), auth(controller.PostChart, config))
 	}
 
+	server := &http.Server{
+		Addr:              config.Address,
+		Handler:           router,
+		ReadHeaderTimeout: 20 * time.Second,
+	}
+
 	log.Infof("Starting http server on %q", config.Address)
 	if config.HTTPS {
-		log.Fatal(http.ListenAndServeTLS(config.Address, config.Certificate, config.Key, router))
+		log.Fatal(server.ListenAndServeTLS(config.Certificate, config.Key))
 		return
 	}
-	log.Fatal(http.ListenAndServe(config.Address, router))
+	log.Fatal(server.ListenAndServe())
 }
